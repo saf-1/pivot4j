@@ -271,12 +271,20 @@ body.report .pe-layout-pane-header {
 
 .pivot-grid .col-hdr-cell,.pivot-grid .agg-hdr {
 	white-space: nowrap;
+
+	max-width: 200px;
+	min-width: 100px;
+	white-space: normal;
 }
 
 .pivot-grid .row-hdr-cell,.filter-grid .row-hdr-cell {
 	vertical-align: top;
 	white-space: nowrap;
 	background-image: none;
+
+	max-width: 250px;
+	min-width: 100px;
+	white-space: normal;
 }
 
 .pivot-grid .col-agg-cell,.pivot-grid .row-agg-cell {

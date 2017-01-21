@@ -1,12 +1,12 @@
 package org.pivot4j.analytics.ui;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -18,7 +18,9 @@ import javax.faces.bean.RequestScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
 import javax.faces.component.UISelectItem;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -38,6 +40,7 @@ import org.pivot4j.QueryEvent;
 import org.pivot4j.QueryListener;
 import org.pivot4j.analytics.config.Settings;
 import org.pivot4j.analytics.datasource.ConnectionInfo;
+import org.pivot4j.analytics.repository.ReportFile;
 import org.pivot4j.analytics.state.ViewState;
 import org.pivot4j.impl.PivotModelImpl;
 import org.pivot4j.transform.NonEmpty;
@@ -91,6 +94,8 @@ public class ViewHandler implements QueryListener, ModelChangeListener {
 	private UIComponent filterComponent;
 
 	private Exception lastError;
+
+	private String directLink;
 
 	@PostConstruct
 	protected void initialize() {
@@ -170,12 +175,49 @@ public class ViewHandler implements QueryListener, ModelChangeListener {
 		this.lastError = error;
 	}
 
+	public void showExportLink() throws IOException {
+		RequestContext requestContext = RequestContext.getCurrentInstance();
+		ReportFile rf = stateManager.getState().getFile();
+
+		if (rf == null) {
+			return;
+		}
+
+		FacesContext fc = FacesContext.getCurrentInstance();
+		ExternalContext ec = fc.getExternalContext();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(ec.getRequestContextPath());
+		sb.append(((HttpServletRequest)ec.getRequest()).getServletPath());
+		sb.append("/open.xhtml?");
+		sb.append("path=");
+		sb.append(URLEncoder.encode(rf.getPath(), "UTF-8"));
+		sb.append("&download=true");
+
+		URL url = new URL(ec.getRequestScheme(),
+				ec.getRequestServerName(),
+				ec.getRequestServerPort(),
+				sb.toString());
+
+		setDirectLink(url.toString());
+		requestContext.update("dl_input");
+		requestContext.execute("PF('dl_dlg').show();");
+	}
+
 	@PreDestroy
 	protected void destroy() {
 		if (model != null) {
 			model.removeQueryListener(this);
 			model.removeModelChangeListener(this);
 		}
+	}
+
+	public String getDirectLink() {
+		return directLink;
+	}
+
+	public void setDirectLink(String directLink) {
+		this.directLink = directLink;
 	}
 
 	/**

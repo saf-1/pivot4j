@@ -1,6 +1,6 @@
 package org.pivot4j.analytics.ui;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,10 +10,13 @@ import javax.faces.application.NavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.print.attribute.standard.OrientationRequested;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.IOUtils;
 import org.pivot4j.analytics.config.Settings;
 import org.pivot4j.analytics.datasource.DataSourceManager;
 import org.pivot4j.analytics.repository.DataSourceNotFoundException;
@@ -22,6 +25,10 @@ import org.pivot4j.analytics.repository.ReportFile;
 import org.pivot4j.analytics.repository.ReportRepository;
 import org.pivot4j.analytics.state.ViewState;
 import org.pivot4j.analytics.state.ViewStateHolder;
+import org.pivot4j.ui.fop.FopExporter;
+import org.pivot4j.ui.poi.ExcelExporter;
+import org.pivot4j.ui.poi.Format;
+import org.pivot4j.ui.table.TableRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +54,8 @@ public class ReportOpener {
 
 	private String path;
 
+	private boolean download = false;
+
 	private boolean embeded = false;
 
 	public void load() throws IOException, ClassNotFoundException,
@@ -70,6 +79,43 @@ public class ReportOpener {
 
 		ReportContent content = reportRepository.getReportContent(file);
 		content.read(state, dataSourceManager, settings.getConfiguration());
+
+		/*-----*/
+
+		if (download) {
+			ExternalContext externalContext = context.getExternalContext();
+			OutputStream out = context.getExternalContext().getResponseOutputStream();
+			Map<String, String> parameters = externalContext.getRequestParameterMap();
+
+			Format format;
+
+			if (parameters.containsKey("format")) {
+				format = Format.valueOf(parameters.get("format"));
+			} else {
+				format = Format.HSSF;
+			}
+
+			String disposition = String.format("attachment; filename=\"%s.%s\"",
+					"report", format.getExtension());
+
+			/*state.getModel().getCube().getName()*/
+
+			externalContext.setResponseHeader("Content-Disposition", disposition);
+
+			TableRenderer renderer = new TableRenderer();
+			ExcelExporter exporter = new ExcelExporter(out);
+			exporter.setFormat(format);
+
+			externalContext.setResponseContentType(exporter.getContentType());
+			renderer.setShowSlicerMembersInline(false);
+			renderer.render(state.getModel(), exporter);
+
+			context.responseComplete();
+			context.renderResponse();
+			return;
+		}
+
+		/*-----*/
 
 		viewStateHolder.registerState(state);
 
@@ -209,6 +255,14 @@ public class ReportOpener {
 	 */
 	public void setEmbeded(boolean embeded) {
 		this.embeded = embeded;
+	}
+
+	public boolean isDownload() {
+		return download;
+	}
+
+	public void setDownload(boolean download) {
+		this.download = download;
 	}
 
 	/**

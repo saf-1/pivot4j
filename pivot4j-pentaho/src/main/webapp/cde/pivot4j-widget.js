@@ -32,7 +32,10 @@ var Pivot4JComponent = BaseComponent.extend({
 				} else {
 					value = Dashboards.getParameterValue(value);
 				}
-				query = query + "&" + encodeURIComponent(key) + "=" + encodeURIComponent(value);
+
+				if (value) {
+					query = query + "&" + encodeURIComponent(key) + "=" + encodeURIComponent(value);
+				}
 			}
 		}
 

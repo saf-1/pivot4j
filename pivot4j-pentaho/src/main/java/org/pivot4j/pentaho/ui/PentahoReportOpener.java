@@ -135,6 +135,8 @@ public class PentahoReportOpener extends ReportOpener {
 			repository.setReportContent(file, content);
 		}
 
+		state.setFile(file);
+
 		FacesContext context = FacesContext.getCurrentInstance();
 		ResourceBundle bundle = context.getApplication().getResourceBundle(
 				context, "msg");

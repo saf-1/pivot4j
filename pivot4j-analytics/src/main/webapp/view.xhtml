@@ -45,6 +45,12 @@
 				mdxEditor.render();
 			}
 		}
+
+		function selectDirectLink() {
+			var input = document.getElementById('dl_input');
+			input.focus();
+			input.select();
+		}
 	</script>
 </h:head>
 
@@ -239,11 +245,19 @@
 							<p:menuitem 
 								value="#{msg['toolbar.print']}" title="#{msg['toolbar.print.tooltip']}" 
 								icon="ui-icon-print" onclick="$('table.pivot-grid:first').jqprint();" />
+							<p:separator />
+							<p:menuitem
+									value="#{msg['toolbar.download.link.xls']}" title="#{msg['toolbar.download.link.xls.tooltip']}"
+									action="#{viewHandler.showExportLink}"/>
 						</p:menuButton>
 					</f:facet>
 				</p:toolbar>
 			</h:form>
 		</pe:layoutPane>
+
+		<p:dialog header="#{msg['toolbar.download.link.xls']}" widgetVar="dl_dlg" resizable="false" onShow="selectDirectLink();">
+			<p:inputTextarea id="dl_input" widgetVar="dl_input" value="#{viewHandler.directLink}" rows="6" cols="50" />
+		</p:dialog>
 
 		<pe:layoutPane id="navigator-pane" position="west"
 			rendered="#{viewHandler.editable}">
