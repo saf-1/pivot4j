@@ -57,6 +57,8 @@ public class Settings {
 
 	private String viewParameterName;
 
+	private Integer viewExpiresMin;
+
 	private String fileParameterName;
 
 	private String pathParameterName;
@@ -310,6 +312,15 @@ public class Settings {
 		}
 
 		return viewParameterName;
+	}
+
+	public Integer getViewExpiresMin() {
+		if (viewExpiresMin == null) {
+			this.viewExpiresMin = configuration.getInteger(
+					"web.view-expires-min", 5);
+		}
+
+		return viewExpiresMin;
 	}
 
 	public String getFileParameterName() {

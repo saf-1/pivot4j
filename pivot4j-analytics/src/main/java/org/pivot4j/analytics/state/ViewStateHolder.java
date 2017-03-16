@@ -72,6 +72,8 @@ public class ViewStateHolder implements Serializable {
 		HttpSession session = (HttpSession) context.getSession(true);
 		this.sessionId = session.getId();
 
+		expires = settings.getViewExpiresMin() * MINUTE;
+
 		if (log.isInfoEnabled()) {
 			log.info("Initializing view state holder for session : "
 					+ sessionId);
