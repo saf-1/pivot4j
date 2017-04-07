@@ -45,5 +45,8 @@
 
 		<!-- Name of a request parameter for view id. -->
 		<view-parameter>ts</view-parameter>
+
+		<!-- Expires time for not used view -->
+		<view-expires-min>60</view-expires-min>
 	</web>
 </config>
