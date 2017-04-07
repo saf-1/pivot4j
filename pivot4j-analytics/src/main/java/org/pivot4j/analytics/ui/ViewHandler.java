@@ -85,6 +85,8 @@ public class ViewHandler implements QueryListener, ModelChangeListener {
 
 	private String cubeName;
 
+	private String cubeCaption;
+
 	private String currentMdx;
 
 	private long duration;
@@ -107,6 +109,7 @@ public class ViewHandler implements QueryListener, ModelChangeListener {
 
 			if (model.isInitialized()) {
 				this.cubeName = model.getCube().getName();
+				this.cubeCaption = model.getCube().getCaption();
 
 				checkError(model);
 			} else {
@@ -115,6 +118,7 @@ public class ViewHandler implements QueryListener, ModelChangeListener {
 
 				if (connectionInfo != null && !model.isInitialized()) {
 					this.cubeName = connectionInfo.getCubeName();
+					this.cubeCaption = this.cubeName;
 
 					onCubeChange();
 				}
@@ -284,6 +288,21 @@ public class ViewHandler implements QueryListener, ModelChangeListener {
 	 */
 	public void setCubeName(String cubeName) {
 		this.cubeName = cubeName;
+	}
+
+	/**
+	 * @return the cubeCaption
+	 */
+	public String getCubeCaption() {
+		return cubeCaption;
+	}
+
+	/**
+	 * @param cubeCaption
+	 *            the cubeCaption to set
+	 */
+	public void setCubeCaption(String cubeCaption) {
+		this.cubeCaption = cubeCaption;
 	}
 
 	/**
