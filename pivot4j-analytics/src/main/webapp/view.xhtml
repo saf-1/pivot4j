@@ -238,9 +238,6 @@
 								ajax="false">
 								<f:param name="format" value="SXSSF" />
 							</p:menuitem>
-							<p:menuitem id="mi-export-pdf"
-								value="#{msg['toolbar.export.format.pdf']}" icon="ui-icon-print"
-								onclick="PF('exportConfig').show();" />
 							<p:separator />
 							<p:menuitem 
 								value="#{msg['toolbar.print']}" title="#{msg['toolbar.print.tooltip']}" 
@@ -415,7 +412,7 @@
 					<h:panelGroup styleClass="ui-icon ui-icon-title ui-icon-document" />
 					<h:outputText value="#{msg['header.grid']}"
 						rendered="#{viewHandler.editable}" />
-					<h:outputText value="#{viewHandler.cubeName}"
+					<h:outputText value="#{viewHandler.cubeCaption}"
 						rendered="#{!viewHandler.editable}" />
 				</h:panelGroup>
 			</f:facet>
