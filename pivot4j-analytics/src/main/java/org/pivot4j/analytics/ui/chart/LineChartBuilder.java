@@ -45,6 +45,10 @@ public class LineChartBuilder extends AbstractSeriesChartBuilder<LineChartModel>
 
 		model.setZoom(true);
 		model.setShowPointLabels(true);
-		model.getAxes().put(AxisType.X, new CategoryAxis(""));
+
+		Axis xAxis = new CategoryAxis("");
+		xAxis.setTickAngle(model.getAxes().get(AxisType.X).getTickAngle());
+
+		model.getAxes().put(AxisType.X, xAxis);
 	}
 }
