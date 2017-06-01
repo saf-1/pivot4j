@@ -67,7 +67,7 @@
 		options="#{viewHandler.layoutOptions}" widgetVar="workbench">
 		<pe:layoutPane id="toolbar-pane" position="north"
 			styleClassContent="toolbar-area">
-			<h:form id="toolbar-form">
+			<h:form id="toolbar-form" >
 				<p:toolbar id="toolbar">
 					<f:facet name="left">
 						<p:selectBooleanButton 
@@ -231,12 +231,6 @@
 								action="#{pivotExportHandler.exportExcel}" icon="ui-icon-disk"
 								ajax="false">
 								<f:param name="format" value="HSSF" />
-							</p:menuitem>
-							<p:menuitem id="mi-export-xlsx"
-								value="#{msg['toolbar.export.format.xlsx']}"
-								action="#{pivotExportHandler.exportExcel}" icon="ui-icon-disk"
-								ajax="false">
-								<f:param name="format" value="SXSSF" />
 							</p:menuitem>
 							<p:separator />
 							<p:menuitem 
