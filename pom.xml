@@ -78,7 +78,7 @@
         <version.slf4j>1.7.24</version.slf4j>
         <version.log4j>2.8.2</version.log4j>
 
-        <version.mondrian>3.13.0.6-91</version.mondrian>
+        <version.mondrian>3.14.0.0-12</version.mondrian>
         <version.olap4j>1.2.0</version.olap4j>
         <version.pentaho>6.1.0.14-354</version.pentaho>
 
