@@ -299,7 +299,6 @@ public class PivotExportHandler {
      */
     protected void exportExcel(Format format) throws IOException {
         FacesContext context = FacesContext.getCurrentInstance();
-
         String escapedFilename = "file";
         try {
             // Encoding
@@ -307,12 +306,13 @@ public class PivotExportHandler {
         } catch (UnsupportedEncodingException e) {
         }
         ExternalContext externalContext = context.getExternalContext();
-        String disposition = format("attachment; filename=\"%s.%s\"", escapedFilename, format.getExtension());
+        String disposition = format("attachment; filename*=UTF-8''%s.%s", escapedFilename, format.getExtension());
         externalContext.setResponseHeader("Content-Disposition", disposition);
         externalContext.setResponseHeader("Expires", "0");
-        externalContext.setResponseHeader("Cache-Control","must-revalidate, post-check=0, pre-check=0");
+        externalContext.setResponseHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
         externalContext.setResponseHeader("Pragma", "public");
         externalContext.addResponseCookie(Constants.DOWNLOAD_COOKIE, "true", Collections.<String, Object>emptyMap());
+        externalContext.setResponseCharacterEncoding("UTF-8");
 
         TableRenderer renderer = viewHandler.getRenderer();
         OutputStream out = externalContext.getResponseOutputStream();
@@ -322,7 +322,7 @@ public class PivotExportHandler {
 
         ExcelExporter exporter = new ExcelExporter(out);
         exporter.setFormat(format);
-        externalContext.setResponseContentType(exporter.getContentType());
+        externalContext.setResponseContentType(exporter.getContentType() + "; charset=UTF-8");
 
         try {
             renderer.setRenderSlicer(viewHandler.getRenderSlicer());
