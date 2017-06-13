@@ -3,8 +3,6 @@ package org.pivot4j.analytics.ui;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
@@ -13,12 +11,7 @@ import javax.faces.view.facelets.FaceletException;
 import org.apache.commons.lang.NullArgumentException;
 import org.olap4j.Cell;
 import org.olap4j.OlapException;
-import org.olap4j.metadata.Cube;
-import org.olap4j.metadata.Dimension;
-import org.olap4j.metadata.Hierarchy;
-import org.olap4j.metadata.Level;
-import org.olap4j.metadata.Measure;
-import org.olap4j.metadata.MetadataElement;
+import org.olap4j.metadata.*;
 import org.pivot4j.PivotModel;
 import org.pivot4j.analytics.component.tree.NodeFilter;
 import org.pivot4j.analytics.ui.navigator.CubeNode;
@@ -30,219 +23,221 @@ import org.primefaces.model.TreeNode;
 @ViewScoped
 public class DrillThroughHandler implements NodeFilter {
 
-	@ManagedProperty(value = "#{pivotStateManager}")
-	private PivotStateManager stateManager;
+    @ManagedProperty(value = "#{pivotStateManager}")
+    private PivotStateManager stateManager;
 
-	@ManagedProperty(value = "#{drillThroughData}")
-	private DrillThroughDataModel data;
+    @ManagedProperty(value = "#{drillThroughData}")
+    private DrillThroughDataModel data;
 
-	private CubeNode cubeNode;
+    private CubeNode cubeNode;
 
-	private TreeNode[] selection;
+    private TreeNode[] selection;
 
-	private int maximumRows = 0;
+    private int maximumRows = 0;
 
-	private DataTable table;
+    private DataTable table;
 
-	public void update() {
-		update(data.getCell());
-	}
+    public void update() {
+        update(data.getCell());
+    }
 
-	/**
-	 * @param cell
-	 */
-	public void update(Cell cell) {
-		if (cell == null) {
-			throw new NullArgumentException("cell");
-		}
+    /**
+     * @param cell
+     */
+    public void update(Cell cell) {
+        if (cell == null) {
+            throw new NullArgumentException("cell");
+        }
 
-		List<MetadataElement> elements = new LinkedList<MetadataElement>();
+        List<MetadataElement> elements = new LinkedList<MetadataElement>();
 
-		if (selection != null) {
-			for (TreeNode node : selection) {
-				MetadataElement elem = ((MetadataNode<?>) node).getObject();
-				elements.add(elem);
-			}
-		}
+        if (selection != null) {
+            for (TreeNode node : selection) {
+                MetadataElement elem = ((MetadataNode<?>) node).getObject();
+                elements.add(elem);
+            }
+        }
 
-		data.setRowIndex(-1);
-		data.initialize(cell, elements, maximumRows);
+        data.setRowIndex(-1);
+        data.initialize(cell, elements, maximumRows);
 
-		table.setFirst(0);
-	}
+        table.setFirst(0);
+    }
 
-	/**
-	 * @return the cubeNode
-	 */
-	public CubeNode getCubeNode() {
-		if (cubeNode != null) {
-			return cubeNode;
-		}
+    public void reset() {
+        data.reset();
 
-		PivotModel model = stateManager.getModel();
+        this.cubeNode = null;
+        this.selection = null;
+        this.maximumRows = 0;
+    }
 
-		if (model != null && model.isInitialized() && data.getCell() != null) {
-			this.cubeNode = new CubeNode(model.getCube());
-			cubeNode.setNodeFilter(this);
-		}
+    /**
+     * @return the cubeNode
+     */
+    public CubeNode getCubeNode() {
+        if (cubeNode != null) {
+            return cubeNode;
+        }
 
-		return cubeNode;
-	}
+        PivotModel model = stateManager.getModel();
 
-	/**
-	 * @param cubeNode
-	 *            the cubeNode to set
-	 */
-	public void setCubeNode(CubeNode cubeNode) {
-		this.cubeNode = cubeNode;
-	}
+        if (model != null && model.isInitialized() && data.getCell() != null) {
+            this.cubeNode = new CubeNode(model.getCube());
+            cubeNode.setNodeFilter(this);
+        }
 
-	/**
-	 * @return the data
-	 */
-	public DrillThroughDataModel getData() {
-		return data;
-	}
+        return cubeNode;
+    }
 
-	/**
-	 * @param data
-	 *            the data to set
-	 */
-	public void setData(DrillThroughDataModel data) {
-		this.data = data;
-	}
+    /**
+     * @param cubeNode the cubeNode to set
+     */
+    public void setCubeNode(CubeNode cubeNode) {
+        this.cubeNode = cubeNode;
+    }
 
-	/**
-	 * @return the selection
-	 */
-	public TreeNode[] getSelection() {
-		return selection;
-	}
+    /**
+     * @return the data
+     */
+    public DrillThroughDataModel getData() {
+        return data;
+    }
 
-	/**
-	 * @param newSelection
-	 *            the newSelection to set
-	 */
-	public void setSelection(TreeNode[] newSelection) {
-		if (newSelection == null) {
-			this.selection = null;
-		} else {
-			this.selection = Arrays.copyOf(newSelection, newSelection.length);
-		}
-	}
+    /**
+     * @param data the data to set
+     */
+    public void setData(DrillThroughDataModel data) {
+        this.data = data;
+    }
 
-	/**
-	 * @return the maximumRows
-	 */
-	public int getMaximumRows() {
-		return maximumRows;
-	}
+    /**
+     * @return the selection
+     */
+    public TreeNode[] getSelection() {
+        return selection;
+    }
 
-	/**
-	 * @param maximumRows
-	 *            the maximumRows to set
-	 */
-	public void setMaximumRows(int maximumRows) {
-		this.maximumRows = maximumRows;
-	}
+    /**
+     * @param newSelection the newSelection to set
+     */
+    public void setSelection(TreeNode[] newSelection) {
+        if (newSelection == null) {
+            this.selection = null;
+        } else {
+            this.selection = Arrays.copyOf(newSelection, newSelection.length);
+        }
+    }
 
-	/**
-	 * @see org.pivot4j.analytics.component.tree.NodeFilter#isSelected(org.olap4j.metadata.MetadataElement)
-	 */
-	@Override
-	public <T extends MetadataElement> boolean isSelected(T element) {
-		return data.getSelection().contains(element);
-	}
+    /**
+     * @return the maximumRows
+     */
+    public int getMaximumRows() {
+        return maximumRows;
+    }
 
-	/**
-	 * @see org.pivot4j.analytics.component.tree.NodeFilter#isSelectable(org.olap4j.metadata.MetadataElement)
-	 */
-	@Override
-	public <T extends MetadataElement> boolean isSelectable(T element) {
-		return element instanceof Level || element instanceof Measure;
-	}
+    /**
+     * @param maximumRows the maximumRows to set
+     */
+    public void setMaximumRows(int maximumRows) {
+        this.maximumRows = maximumRows;
+    }
 
-	/**
-	 * @see org.pivot4j.analytics.component.tree.NodeFilter#isVisible(org.olap4j.metadata.MetadataElement)
-	 */
-	@Override
-	public <T extends MetadataElement> boolean isVisible(T element) {
-		if (element instanceof Level) {
-			Level level = (Level) element;
+    /**
+     * @see org.pivot4j.analytics.component.tree.NodeFilter#isSelected(org.olap4j.metadata.MetadataElement)
+     */
+    @Override
+    public <T extends MetadataElement> boolean isSelected(T element) {
+        return data.getSelection().contains(element);
+    }
 
-			if (level.getLevelType() == Level.Type.ALL || level.isCalculated()) {
-				return false;
-			}
-		} else if (element instanceof Measure) {
-			return !((Measure) element).isCalculated();
-		}
+    /**
+     * @see org.pivot4j.analytics.component.tree.NodeFilter#isSelectable(org.olap4j.metadata.MetadataElement)
+     */
+    @Override
+    public <T extends MetadataElement> boolean isSelectable(T element) {
+        return element instanceof Level || element instanceof Measure;
+    }
 
-		return true;
-	}
+    /**
+     * @see org.pivot4j.analytics.component.tree.NodeFilter#isVisible(org.olap4j.metadata.MetadataElement)
+     */
+    @Override
+    public <T extends MetadataElement> boolean isVisible(T element) {
+        if (element instanceof Level) {
+            Level level = (Level) element;
 
-	/**
-	 * @see org.pivot4j.analytics.component.tree.NodeFilter#isExpanded(org.olap4j.metadata.MetadataElement)
-	 */
-	@Override
-	public <T extends MetadataElement> boolean isExpanded(T element) {
-		Dimension dimension = null;
+            if (level.getLevelType() == Level.Type.ALL || level.isCalculated()) {
+                return false;
+            }
+        } else if (element instanceof Measure) {
+            return !((Measure) element).isCalculated();
+        }
 
-		if (element instanceof Cube) {
-			return true;
-		} else if (element instanceof Dimension) {
-			dimension = (Dimension) element;
-		} else if (element instanceof Hierarchy) {
-			dimension = ((Hierarchy) element).getDimension();
-		}
+        return true;
+    }
 
-		if (dimension != null) {
-			try {
-				if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
-					return true;
-				}
-			} catch (OlapException e) {
-				throw new FaceletException(e);
-			}
-		}
+    /**
+     * @see org.pivot4j.analytics.component.tree.NodeFilter#isExpanded(org.olap4j.metadata.MetadataElement)
+     */
+    @Override
+    public <T extends MetadataElement> boolean isExpanded(T element) {
+        Dimension dimension = null;
 
-		return false;
-	}
+        if (element instanceof Cube) {
+            return true;
+        } else if (element instanceof Dimension) {
+            dimension = (Dimension) element;
+        } else if (element instanceof Hierarchy) {
+            dimension = ((Hierarchy) element).getDimension();
+        }
 
-	/**
-	 * @see org.pivot4j.analytics.component.tree.NodeFilter#isActive(org.olap4j.metadata.MetadataElement)
-	 */
-	@Override
-	public <T extends MetadataElement> boolean isActive(T element) {
-		return false;
-	}
+        if (dimension != null) {
+            try {
+                if (dimension.getDimensionType() == Dimension.Type.MEASURE) {
+                    return true;
+                }
+            } catch (OlapException e) {
+                throw new FaceletException(e);
+            }
+        }
 
-	/**
-	 * @return the stateManager
-	 */
-	public PivotStateManager getStateManager() {
-		return stateManager;
-	}
+        return false;
+    }
 
-	/**
-	 * @param stateManager
-	 *            the stateManager to set
-	 */
-	public void setStateManager(PivotStateManager stateManager) {
-		this.stateManager = stateManager;
-	}
+    /**
+     * @see org.pivot4j.analytics.component.tree.NodeFilter#isActive(org.olap4j.metadata.MetadataElement)
+     */
+    @Override
+    public <T extends MetadataElement> boolean isActive(T element) {
+        return false;
+    }
 
-	/**
-	 * @return the table
-	 */
-	public DataTable getTable() {
-		return table;
-	}
+    /**
+     * @return the stateManager
+     */
+    public PivotStateManager getStateManager() {
+        return stateManager;
+    }
 
-	/**
-	 * @param table
-	 *            the table to set
-	 */
-	public void setTable(DataTable table) {
-		this.table = table;
-	}
+    /**
+     * @param stateManager the stateManager to set
+     */
+    public void setStateManager(PivotStateManager stateManager) {
+        this.stateManager = stateManager;
+    }
+
+    /**
+     * @return the table
+     */
+    public DataTable getTable() {
+        return table;
+    }
+
+    /**
+     * @param table the table to set
+     */
+    public void setTable(DataTable table) {
+        this.table = table;
+    }
 }
